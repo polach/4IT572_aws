@@ -96,6 +96,9 @@ jobs:
     needs: [Build, Test]
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
+    env:
+      VAULT_PASS: ${{ secrets.VAULT_PASS }}
+      RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
 
     steps:
       - name: Git Checkout
@@ -103,18 +106,16 @@ jobs:
         with:
           token: ${{ secrets.WORKFLOW_TOKEN }}
 
-      - name: Load node modules and build folder
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            ./node_modules
-            ./build
-          key: ${{ runner.os }}-build-${{ github.run_id }}
+      - name: Install Ansible
+        run: pip3 install ansible boto boto3
 
-      - name: Deploy function
-        uses: lowply/deploy-firebase@v0.0.5
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          FIREBASE_PROJECT: polach-devops
+      - name: SSH key and vault password
+        run: |
+          echo "$VAULT_PASS" > vault_pass.txt
+          chmod 400 vault_pass.txt
+          echo "$RSA_PRIVATE_KEY" > devops.pem
+          chmod 400 devops.pem
+          sudo ssh-keygen -p -f devops.pem -m pem
+      - name: Run Ansible
+        run: ansible-playbook ansible/ec2_deploy.yml --ssh-common-args='-o StrictHostKeyChecking=no' --user ec2-user --key-file devops.pem --e @group_vars/all/aws.yml --vault-password-file vault_pass.txt
        
