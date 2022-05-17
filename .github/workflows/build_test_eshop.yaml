@@ -113,9 +113,9 @@ jobs:
         run: |
           echo "$VAULT_PASS" > vault_pass.txt
           chmod 400 vault_pass.txt
-          echo "$RSA_PRIVATE_KEY" > devops.pem
-          chmod 400 devops.pem
-          sudo ssh-keygen -p -f devops.pem -m pem
+          echo "$RSA_PRIVATE_KEY" > aws.pem
+          chmod 400 aws.pem
+          sudo ssh-keygen -p -f aws.pem -m pem
       - name: Run Ansible
-        run: ansible-playbook ansible/ec2_deploy.yml --ssh-common-args='-o StrictHostKeyChecking=no' --user ec2-user --key-file devops.pem --e @group_vars/all/aws.yml --vault-password-file vault_pass.txt
+        run: ansible-playbook ansible/ec2_deploy.yml --ssh-common-args='-o StrictHostKeyChecking=no' --user ec2-user --key-file aws.pem --e @group_vars/all/aws.yml --vault-password-file vault_pass.txt
        
