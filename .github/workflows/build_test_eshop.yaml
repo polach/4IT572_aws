@@ -117,5 +117,5 @@ jobs:
           chmod 400 aws.pem
           sudo ssh-keygen -p -f aws.pem -m pem
       - name: Run Ansible
-        run: ansible-playbook ansible/ec2_deploy.yml --ssh-common-args='-o StrictHostKeyChecking=no' --user ec2-user --key-file aws.pem --e @group_vars/all/aws.yml --vault-password-file vault_pass.txt
+        run: ansible-playbook ec2_deploy.yml --ssh-common-args='-o StrictHostKeyChecking=no' --user ec2-user --key-file aws.pem --e @group_vars/all/aws.yml --vault-password-file vault_pass.txt
        
