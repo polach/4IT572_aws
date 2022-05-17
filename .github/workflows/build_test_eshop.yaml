@@ -98,7 +98,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     env:
       VAULT_PASS: ${{ secrets.VAULT_PASS }}
-      RSA_PRIVATE_KEY: ${{ secrets.RSA_PRIVATE_KEY }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
 
     steps:
       - name: Git Checkout
@@ -113,7 +113,7 @@ jobs:
         run: |
           echo "$VAULT_PASS" > vault_pass.txt
           chmod 400 vault_pass.txt
-          echo "$RSA_PRIVATE_KEY" > aws.pem
+          echo "$PRIVATE_KEY" > aws.pem
           chmod 400 aws.pem
           sudo ssh-keygen -p -f aws.pem -m pem
       - name: Run Ansible
