@@ -66,7 +66,7 @@
       become: yes
     - name: Get eshop from GIT
       git:
-        repo: 'https://github.com/polach/4IT572_docker.git'
+        repo: 'https://github.com/polach/4IT572_aws.git'
         dest: ./app
     - name: Build Docker with eshop
       shell: cd app && docker build -t myeshop:latest .
