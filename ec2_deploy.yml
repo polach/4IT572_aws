@@ -6,10 +6,10 @@
     - name: Launch EC2 Instance
       ec2:
         instance_type: t2.micro
-        image: ami-03ededff12e34e59e
+        image: ami-06eecef118bbf9259
         region: us-east-1
         key_name: devops
-        vpc_subnet_id: subnet-00049dbc8d46e9061
+        vpc_subnet_id: subnet-0e38ade6655e80f88
         assign_public_ip: yes
         wait: yes
         count: 1
@@ -30,6 +30,15 @@
         delay: 30
         timeout: 300
       loop: "{{ ec2.instances }}"
+
+    - name: Get actual instances
+      ec2_instance_info:
+        region: us-east-1
+        aws_access_key: "{{access_key}}"
+        aws_secret_key: "{{secret_key}}"
+        security_token: "{{session_token}}"
+      register: actual
+    
 
 - name: Configure EC2
   hosts: launched
@@ -70,3 +79,19 @@
     - wait_for:
         port:
           80
+
+- name: Terminate instances
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Terminate latest instances
+      amazon.aws.ec2:
+        region: us-east-1
+        state: 'absent'
+        instance_ids: '{{ item.instance_id }}'
+        aws_access_key: "{{access_key}}"
+        aws_secret_key: "{{secret_key}}"
+        security_token: "{{session_token}}"
+        wait: yes
+      with_items: "{{actual.instances}}"
