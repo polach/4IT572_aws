@@ -3,22 +3,6 @@
   connection: local
 
   tasks:
-  
-    - name: Terminate instances
-      hosts: localhost
-      connection: local
-
-      tasks:
-        - name: Terminate latest instances
-          amazon.aws.ec2:
-            region: us-east-1
-            state: 'absent'
-            instance_ids: '{{ item.instance_id }}'
-            aws_access_key: "{{access_key}}"
-            aws_secret_key: "{{secret_key}}"
-            security_token: "{{session_token}}"
-            wait: yes
-          with_items: "{{actual.instances}}"
 
     - name: Launch EC2 Instance
       ec2:
@@ -96,3 +80,19 @@
     - wait_for:
         port:
           80
+  
+- name: Terminate instances
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Terminate latest instances
+      amazon.aws.ec2:
+        region: us-east-1
+        state: 'absent'
+        instance_ids: '{{ item.instance_id }}'
+        aws_access_key: "{{access_key}}"
+        aws_secret_key: "{{secret_key}}"
+        security_token: "{{session_token}}"
+        wait: yes
+      with_items: "{{actual.instances}}"
